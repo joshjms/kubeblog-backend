@@ -39,6 +39,15 @@ func (r *ArticleRepository) GetAllArticles() ([]Article, error) {
 	return articles, nil
 }
 
+func (r *ArticleRepository) GetFeaturedArticles() ([]Article, error) {
+	var articles []Article
+	err := r.DB.Where("featured = ?", true).Find(&articles).Error
+	if err != nil {
+		return nil, err
+	}
+	return articles, nil
+}
+
 func (r *ArticleRepository) UpdateArticle(article *Article) error {
 	return r.DB.Save(article).Error
 }

@@ -11,7 +11,8 @@ type Article struct {
 	Excerpt  string    `json:"excerpt"`
 	Tags     string    `json:"tags"`
 
-	Author string `json:"author"`
+	Author   string `json:"author"`
+	Featured bool   `json:"featured"`
 
 	// Timestamps
 	CreatedAt int64 `json:"created_at"`
