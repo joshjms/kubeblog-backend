@@ -12,6 +12,8 @@ type ArticleRepository struct {
 }
 
 func NewArticleRepository(db *gorm.DB) *ArticleRepository {
+	db.AutoMigrate(&Article{})
+
 	return &ArticleRepository{DB: db}
 }
 
