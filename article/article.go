@@ -10,6 +10,12 @@ type Article struct {
 	Category Category  `json:"category"`
 	Excerpt  string    `json:"excerpt"`
 	Tags     string    `json:"tags"`
+
+	Author string `json:"author"`
+
+	// Timestamps
+	CreatedAt int64 `json:"created_at"`
+	UpdatedAt int64 `json:"updated_at"`
 }
 
 type Category string

@@ -18,7 +18,7 @@ func ValidateGoogleTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 
 		token := authHeader[len("Bearer "):]
 
-		payload, err := idtoken.Validate(context.Background(), token, "YOUR_GOOGLE_CLIENT_ID")
+		payload, err := idtoken.Validate(context.Background(), token, "257566191758-cd6jv7m3st9dumkgoqa9bn8eqae53pk0.apps.googleusercontent.com")
 		if err != nil {
 			log.Println("Invalid token:", err)
 			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "invalid token"})
