@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/kubeblog/backend/middleware"
 	"github.com/labstack/echo/v4"
 )
 
@@ -17,10 +18,12 @@ func NewArticleService(r *ArticleRepository) *ArticleService {
 
 func (h *ArticleService) Route(e *echo.Echo) {
 	e.GET("/articles", h.GetAllArticles)
-	e.POST("/articles", h.CreateArticle)
 	e.GET("/articles/:id", h.GetArticleByID)
-	e.PUT("/articles/:id", h.UpdateArticle)
-	e.DELETE("/articles/:id", h.DeleteArticle)
+
+	// Protected routes
+	e.POST("/articles", h.CreateArticle, middleware.ValidateGoogleTokenMiddleware)
+	e.PUT("/articles/:id", h.UpdateArticle, middleware.ValidateGoogleTokenMiddleware)
+	e.DELETE("/articles/:id", h.DeleteArticle, middleware.ValidateGoogleTokenMiddleware)
 }
 
 func (h *ArticleService) GetAllArticles(c echo.Context) error {
