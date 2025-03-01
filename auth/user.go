@@ -1,8 +1,6 @@
-package user
+package auth
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -16,7 +14,7 @@ type User struct {
 func NewUser(email, displayName string) *User {
 	return &User{
 		ID:          uuid.New(),
-		Username:    fmt.Sprintf("user-%s", uuid.New().String()),
+		Username:    email,
 		Email:       email,
 		DisplayName: displayName,
 	}
