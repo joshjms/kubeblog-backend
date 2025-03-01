@@ -23,7 +23,7 @@ func (r *ArticleRepository) CreateArticle(article *Article) error {
 
 func (r *ArticleRepository) GetArticleByID(id uuid.UUID) (*Article, error) {
 	var article Article
-	err := r.DB.First(&article, "id = ?", id).Error
+	err := r.DB.Preload("Author").First(&article, "id = ?", id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +32,7 @@ func (r *ArticleRepository) GetArticleByID(id uuid.UUID) (*Article, error) {
 
 func (r *ArticleRepository) GetAllArticles() ([]Article, error) {
 	var articles []Article
-	err := r.DB.Find(&articles).Error
+	err := r.DB.Preload("Author").Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +41,7 @@ func (r *ArticleRepository) GetAllArticles() ([]Article, error) {
 
 func (r *ArticleRepository) GetFeaturedArticles() ([]Article, error) {
 	var articles []Article
-	err := r.DB.Where("featured = ?", true).Find(&articles).Error
+	err := r.DB.Where("featured = ?", true).Preload("Author").Find(&articles).Error
 	if err != nil {
 		return nil, err
 	}

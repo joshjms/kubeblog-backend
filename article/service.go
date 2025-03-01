@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/kubeblog/backend/auth"
 	"github.com/kubeblog/backend/middleware"
 	"github.com/labstack/echo/v4"
-	"google.golang.org/api/idtoken"
 )
 
 type ArticleService struct {
@@ -45,7 +45,7 @@ func (h *ArticleService) GetAllArticles(c echo.Context) error {
 func (h *ArticleService) CreateArticle(c echo.Context) error {
 	var article Article
 	article.ID = uuid.New()
-	article.Author = c.Get("user").(*idtoken.Payload).Subject
+	article.AuthorID = c.Get("user").(*auth.User).ID
 	article.CreatedAt = time.Now().Unix()
 	article.UpdatedAt = time.Now().Unix()
 

@@ -1,9 +1,12 @@
 package article
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"github.com/kubeblog/backend/auth"
+)
 
 type Article struct {
-	ID       uuid.UUID `json:"id"`
+	ID       uuid.UUID `json:"id" gorm:"type:uuid;primary_key"`
 	Title    string    `json:"title"`
 	Content  string    `json:"content"`
 	Image    string    `json:"image"`
@@ -11,8 +14,9 @@ type Article struct {
 	Excerpt  string    `json:"excerpt"`
 	Tags     string    `json:"tags"`
 
-	Author   string `json:"author"`
-	Featured bool   `json:"featured"`
+	AuthorID uuid.UUID `json:"author_id" gorm:"type:uuid;not null"`
+	Author   auth.User `json:"author" gorm:"foreignKey:AuthorID"`
+	Featured bool      `json:"featured"`
 
 	// Timestamps
 	CreatedAt int64 `json:"created_at"`
