@@ -9,6 +9,12 @@ type User struct {
 	Username    string    `json:"username" gorm:"unique;not null"`
 	Email       string    `json:"email"`
 	DisplayName string    `json:"display_name"`
+
+	Bio string `json:"bio"`
+
+	Github  string `json:"github"`
+	Twitter string `json:"twitter"`
+	Website string `json:"website"`
 }
 
 func NewUser(email, displayName string) *User {
