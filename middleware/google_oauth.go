@@ -5,17 +5,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/kubeblog/backend/auth"
+	"github.com/kubeblog/backend/models"
+	"github.com/kubeblog/backend/repositories"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/api/idtoken"
 )
 
 type AuthMiddleware struct {
-	userRepository *auth.UserRepository
+	userRepository *repositories.UserRepository
 }
 
-func NewAuthMiddleware(r *auth.UserRepository) *AuthMiddleware {
-	return &AuthMiddleware{userRepository: r}
+func NewAuthMiddleware(r *repositories.UserRepository) *AuthMiddleware {
+	return &AuthMiddleware{
+		userRepository: r,
+	}
 }
 
 func (mw *AuthMiddleware) ValidateGoogleTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
@@ -35,7 +38,7 @@ func (mw *AuthMiddleware) ValidateGoogleTokenMiddleware(next echo.HandlerFunc) e
 
 		user, err := mw.userRepository.GetUserByEmail(payload.Claims["email"].(string))
 		if err != nil {
-			user = auth.NewUser(payload.Claims["email"].(string), payload.Claims["name"].(string))
+			user = models.NewUser(payload.Claims["email"].(string), payload.Claims["name"].(string))
 			if err := mw.userRepository.CreateUser(user); err != nil {
 				log.Println("Failed to create user:", err)
 				return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to create user"})

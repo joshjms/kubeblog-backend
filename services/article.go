@@ -1,4 +1,4 @@
-package article
+package services
 
 import (
 	"encoding/base64"
@@ -12,14 +12,16 @@ import (
 	"github.com/google/uuid"
 	"github.com/kubeblog/backend/auth"
 	"github.com/kubeblog/backend/middleware"
+	"github.com/kubeblog/backend/models"
+	"github.com/kubeblog/backend/repositories"
 	"github.com/labstack/echo/v4"
 )
 
 type ArticleService struct {
-	repository *ArticleRepository
+	repository *repositories.ArticleRepository
 }
 
-func NewArticleService(r *ArticleRepository) *ArticleService {
+func NewArticleService(r *repositories.ArticleRepository) *ArticleService {
 	return &ArticleService{repository: r}
 }
 
@@ -43,7 +45,7 @@ func (h *ArticleService) GetAllArticles(c echo.Context) error {
 }
 
 func (h *ArticleService) CreateArticle(c echo.Context) error {
-	var article Article
+	var article models.Article
 	article.ID = uuid.New()
 	article.AuthorID = c.Get("user").(*auth.User).ID
 	article.CreatedAt = time.Now().Unix()
@@ -81,6 +83,18 @@ func (h *ArticleService) GetArticleByID(c echo.Context) error {
 	return c.JSON(http.StatusOK, article)
 }
 
+func (h *ArticleService) GetArticleByAuthorID(c echo.Context) error {
+	id, err := uuid.Parse(c.Param("id"))
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err)
+	}
+	articles, err := h.repository.GetArticleByAuthorID(id)
+	if err != nil {
+		return c.JSON(http.StatusNotFound, err)
+	}
+	return c.JSON(http.StatusOK, articles)
+}
+
 func (h *ArticleService) GetFeaturedArticles(c echo.Context) error {
 	articles, err := h.repository.GetFeaturedArticles()
 	if err != nil {
@@ -90,7 +104,7 @@ func (h *ArticleService) GetFeaturedArticles(c echo.Context) error {
 }
 
 func (h *ArticleService) UpdateArticle(c echo.Context) error {
-	var article Article
+	var article models.Article
 	if err := c.Bind(&article); err != nil {
 		return c.JSON(http.StatusBadRequest, err)
 	}

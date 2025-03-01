@@ -8,10 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/google/uuid"
-	"github.com/kubeblog/backend/article"
-	"github.com/kubeblog/backend/auth"
 	"github.com/kubeblog/backend/database"
 	mw "github.com/kubeblog/backend/middleware"
+	"github.com/kubeblog/backend/repositories"
+	"github.com/kubeblog/backend/services"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -22,15 +22,18 @@ func main() {
 	db := database.ConnectDB()
 	database.AutoMigrate(db)
 
-	userRepository := auth.NewUserRepository(db)
-	authMiddleware := mw.NewAuthMiddleware(userRepository)
+	userRepository := repositories.NewUserRepository(db)
+	userSvc := services.NewUserService(userRepository)
 
-	articleRepository := article.NewArticleRepository(db)
-	articleSvc := article.NewArticleService(articleRepository)
+	articleRepository := repositories.NewArticleRepository(db)
+	articleSvc := services.NewArticleService(articleRepository)
+
+	authMiddleware := mw.NewAuthMiddleware(userRepository)
 
 	e := echo.New()
 
 	articleSvc.Route(e, authMiddleware)
+	userSvc.Route(e, authMiddleware)
 
 	if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
 		err := os.Mkdir(uploadDir, os.ModePerm)
