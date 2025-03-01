@@ -5,14 +5,20 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/google/uuid"
-	"github.com/kubeblog/backend/database"
-	"github.com/kubeblog/backend/user"
+	"github.com/kubeblog/backend/auth"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/api/idtoken"
 )
 
-func ValidateGoogleTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+type AuthMiddleware struct {
+	userRepository *auth.UserRepository
+}
+
+func NewAuthMiddleware(r *auth.UserRepository) *AuthMiddleware {
+	return &AuthMiddleware{userRepository: r}
+}
+
+func (mw *AuthMiddleware) ValidateGoogleTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		authHeader := c.Request().Header.Get("Authorization")
 		if authHeader == "" {
@@ -27,23 +33,16 @@ func ValidateGoogleTokenMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 			return c.JSON(http.StatusUnauthorized, echo.Map{"error": "invalid token"})
 		}
 
-		// Create user if not exists in database
-		userRepository := user.NewUserRepository(database.Db)
-		currentUser, err := userRepository.GetUserByEmail(payload.Claims["email"].(string))
+		user, err := mw.userRepository.GetUserByEmail(payload.Claims["email"].(string))
 		if err != nil {
-			currentUser = &user.User{
-				ID:          uuid.New(),
-				Email:       payload.Claims["email"].(string),
-				Username:    payload.Claims["email"].(string),
-				DisplayName: payload.Claims["name"].(string),
-			}
-			if err := userRepository.CreateUser(currentUser); err != nil {
+			user = auth.NewUser(payload.Claims["email"].(string), payload.Claims["name"].(string))
+			if err := mw.userRepository.CreateUser(user); err != nil {
+				log.Println("Failed to create user:", err)
 				return c.JSON(http.StatusInternalServerError, echo.Map{"error": "failed to create user"})
 			}
 		}
 
-		// Store user in the request context
-		c.Set("user", currentUser)
+		c.Set("user", user)
 
 		return next(c)
 	}
