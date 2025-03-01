@@ -23,15 +23,15 @@ func NewArticleService(r *ArticleRepository) *ArticleService {
 	return &ArticleService{repository: r}
 }
 
-func (h *ArticleService) Route(e *echo.Echo) {
+func (h *ArticleService) Route(e *echo.Echo, authMiddleware *middleware.AuthMiddleware) {
 	e.GET("/articles", h.GetAllArticles)
 	e.GET("/articles/:id", h.GetArticleByID)
 	e.GET("/articles/featured", h.GetFeaturedArticles)
 
 	// Protected routes
-	e.POST("/articles", h.CreateArticle, middleware.ValidateGoogleTokenMiddleware)
-	e.PUT("/articles/:id", h.UpdateArticle, middleware.ValidateGoogleTokenMiddleware)
-	e.DELETE("/articles/:id", h.DeleteArticle, middleware.ValidateGoogleTokenMiddleware)
+	e.POST("/articles", h.CreateArticle, authMiddleware.ValidateGoogleTokenMiddleware)
+	e.PUT("/articles/:id", h.UpdateArticle, authMiddleware.ValidateGoogleTokenMiddleware)
+	e.DELETE("/articles/:id", h.DeleteArticle, authMiddleware.ValidateGoogleTokenMiddleware)
 }
 
 func (h *ArticleService) GetAllArticles(c echo.Context) error {
