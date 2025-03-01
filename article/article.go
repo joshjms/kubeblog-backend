@@ -14,13 +14,13 @@ type Article struct {
 	Excerpt  string    `json:"excerpt"`
 	Tags     string    `json:"tags"`
 
-	AuthorID uuid.UUID `json:"author_id" gorm:"type:uuid;not null"`
+	AuthorID uuid.UUID `json:"authorId" gorm:"type:uuid;not null"`
 	Author   auth.User `json:"author" gorm:"foreignKey:AuthorID"`
 	Featured bool      `json:"featured"`
 
 	// Timestamps
-	CreatedAt int64 `json:"created_at"`
-	UpdatedAt int64 `json:"updated_at"`
+	CreatedAt int64 `json:"createdAt"`
+	UpdatedAt int64 `json:"updatedAt"`
 }
 
 type Category string

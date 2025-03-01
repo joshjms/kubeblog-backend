@@ -8,7 +8,7 @@ type User struct {
 	ID          uuid.UUID `json:"id" gorm:"primaryKey"`
 	Username    string    `json:"username" gorm:"unique;not null"`
 	Email       string    `json:"email"`
-	DisplayName string    `json:"display_name"`
+	DisplayName string    `json:"displayName"`
 
 	Bio string `json:"bio"`
 
